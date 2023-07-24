@@ -31,7 +31,7 @@ Shader "Custom/ToonShaderRetry"
             #pragma fragment Fragment
 
             // Include our code file
-            #include "ToonShaderForwardLitPass.hlsl"
+            #include "SubGraphs/ToonShaderForwardLitPass.hlsl"
             ENDHLSL
         }
 
@@ -45,7 +45,7 @@ Shader "Custom/ToonShaderRetry"
             #pragma vertex Vertex
             #pragma fragment Fragment
 
-            #include "ToonShaderShadowCasterPass.hlsl"
+            #include "SubGraphs/ToonShaderShadowCasterPass.hlsl"
             ENDHLSL
         }
     }
