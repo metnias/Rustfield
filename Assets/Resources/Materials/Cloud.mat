@@ -106,29 +106,31 @@ Material:
     - _BumpScale: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
-    - _Color_Divide_Blur: 80
+    - _Color_Divide_Blur: 10
     - _Color_Divide_Height: 100
     - _Cull: 2
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _Displacement_Intensity: 30
-    - _Displacement_Scale: 10
-    - _Displacement_Speed: 0.03
+    - _Displacement_Intensity: 4
+    - _Displacement_Scale: 100
+    - _Displacement_Speed: 0.0002
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
     - _Fade_Depth: 100
+    - _Fresnel_Power: 1
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
-    - _PickX: 0
+    - _PickX: 1
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
+    - _Shade_Blur: 0.3
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
