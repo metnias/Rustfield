@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Cell01A
+  m_Name: Cell01B
   m_Shader: {fileID: -6465566751694194690, guid: 3dc16f97fad1b23449d5e37d3c578786,
     type: 3}
   m_Parent: {fileID: 0}
@@ -115,7 +115,7 @@ Material:
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
-    - _PickX: 0.012
+    - _PickX: 0.081
     - _PowY: 1
     - _QueueControl: 0
     - _QueueOffset: 0
@@ -123,14 +123,14 @@ Material:
     - _RangeYTop: 1
     - _ReceiveShadows: 1
     - _SHADOWS_SOFT: 1
-    - _ShadowStrength: 0.5
+    - _ShadowStrength: 1
     - _Smoothness: 0.1
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 0
-    - _TextureStrength: 0.075
+    - _TextureStrength: 0
     - _WorkflowMode: 1
     - _YPow: 1
     - _ZWrite: 1
