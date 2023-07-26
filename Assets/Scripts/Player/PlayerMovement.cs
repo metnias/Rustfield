@@ -18,13 +18,17 @@ public class PlayerMovement : MonoBehaviour
     private float maxGroundAngle = 60f;
     [SerializeField, Range(0f, 20f)]
     private float gravity = 1f;
+    [SerializeField]
+    private LayerMask standableMask = -1;
 
     private Vector2 move = Vector2.zero;
     private float wantToJump = 0f;
-    private bool onGround = false;
+    private bool OnGround => groundContactCount > 0;
+    private bool OnSteep => steepContactCount > 0;
     private float minGroundDotProduct;
-    private Vector3 contactNormal = Vector3.up;
-    private int stepsSinceLastGrounded = 0;
+    private Vector3 contactNormal = Vector3.up, steepNormal = Vector3.zero;
+    private int groundContactCount = 0, steepContactCount = 0;
+    private int stepsSinceLastGrounded = 0, stepsSinceLastJump = 0;
 
     private void OnValidate()
     {
@@ -45,11 +49,7 @@ public class PlayerMovement : MonoBehaviour
         if (wantToJump > 0f)
         {
             wantToJump -= Time.fixedDeltaTime;
-            if (onGround)
-            {
-                wantToJump = 0f;
-                Jump();
-            }
+            Jump();
         }
         AdjustVelocity();
         rBody.velocity = velocity;
@@ -57,7 +57,7 @@ public class PlayerMovement : MonoBehaviour
 
         void UpdateState()
         {
-            if (onGround)
+            if (OnGround || SnapToGround() || CheckSteepContacts())
             {
                 stepsSinceLastGrounded = 0;
                 contactNormal.Normalize();
@@ -67,13 +67,48 @@ public class PlayerMovement : MonoBehaviour
                 ++stepsSinceLastGrounded;
                 contactNormal = Vector3.up;
             }
+            ++stepsSinceLastJump;
+        }
+        bool SnapToGround()
+        {
+            if (stepsSinceLastGrounded > 1 || stepsSinceLastJump <= 2) return false;
+            float curSpeed = velocity.magnitude;
+            if (curSpeed > speed * 0.8f) return false;
+            if (!Physics.Raycast(rBody.position, Vector3.down, out RaycastHit hit, 0.5f, standableMask)) return false;
+            if (hit.normal.y < minGroundDotProduct) return false;
+            contactNormal = hit.normal;
+            float newSpeed = velocity.magnitude;
+            float dot = Vector3.Dot(velocity, hit.normal);
+            if (dot > 0f) velocity = (velocity - hit.normal * dot).normalized * newSpeed;
+            return true;
+        }
+        bool CheckSteepContacts()
+        {
+            if (steepContactCount > 1)
+            {
+                steepNormal.Normalize();
+                if (steepNormal.y >= minGroundDotProduct)
+                {
+                    groundContactCount = 1;
+                    contactNormal = steepNormal;
+                    return true;
+                }
+            }
+            return false;
         }
         void Jump()
         {
+            Vector3 jumpDir;
+            if (OnGround) jumpDir = contactNormal;
+            else if (OnSteep) jumpDir = steepNormal;
+            else return;
+            jumpDir = (jumpDir + Vector3.up).normalized;
+
+            stepsSinceLastJump = 0; wantToJump = 0f;
             float jumpSpeed = jumpStrength;
-            float alignedSpeed = Vector3.Dot(velocity, contactNormal);
+            float alignedSpeed = Vector3.Dot(velocity, jumpDir);
             if (alignedSpeed > 0f) jumpSpeed = Mathf.Max(jumpSpeed - alignedSpeed, 0f);
-            velocity += contactNormal * jumpSpeed;
+            velocity += jumpDir * jumpSpeed;
         }
         void AdjustVelocity()
         {
@@ -82,7 +117,7 @@ public class PlayerMovement : MonoBehaviour
 
             float currentX = Vector3.Dot(velocity, xAxis);
             float currentZ = Vector3.Dot(velocity, zAxis);
-            float acc = onGround ? acceleration : airAcceleration;
+            float acc = OnGround ? acceleration : airAcceleration;
             float maxSpeedChange = acc * Time.fixedDeltaTime;
 
             float newX = Mathf.MoveTowards(currentX, speed * move.x, maxSpeedChange);
@@ -93,8 +128,8 @@ public class PlayerMovement : MonoBehaviour
         Vector3 ProjectOnContactPlane(Vector3 vector) => vector - contactNormal * Vector3.Dot(vector, contactNormal);
         void ClearState()
         {
-            onGround = false;
-            contactNormal = Vector3.zero;
+            groundContactCount = steepContactCount = 0;
+            contactNormal = steepNormal = Vector3.zero;
         }
     }
 
@@ -105,8 +140,13 @@ public class PlayerMovement : MonoBehaviour
             Vector3 normal = collision.GetContact(i).normal;
             if (normal.y >= minGroundDotProduct)
             {
-                onGround = true;
+                ++groundContactCount;
                 contactNormal += normal;
+            }
+            else if (normal.y > -0.01f)
+            {
+                ++steepContactCount;
+                steepNormal += normal;
             }
         }
     }

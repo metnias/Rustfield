@@ -208,6 +208,9 @@ MonoBehaviour:
   jumpStrength: 25
   maxGroundAngle: 60
   gravity: 4
+  standableMask:
+    serializedVersion: 2
+    m_Bits: 65
 --- !u!54 &42296543
 Rigidbody:
   m_ObjectHideFlags: 0
