@@ -202,11 +202,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rBody: {fileID: 42296543}
-  velocity: 15
-  acceleration: 30
-  airAcceleration: 10
-  jumpStrength: 10
+  speed: 15
+  acceleration: 40
+  airAcceleration: 20
+  jumpStrength: 25
   maxGroundAngle: 60
+  gravity: 4
 --- !u!54 &42296543
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -229,7 +230,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 1
   m_Constraints: 112
