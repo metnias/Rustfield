@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Cell01B
+  m_Name: Cell01Z
   m_Shader: {fileID: -6465566751694194690, guid: 3dc16f97fad1b23449d5e37d3c578786,
     type: 3}
   m_Parent: {fileID: 0}
@@ -76,8 +76,8 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Texture:
-        m_Texture: {fileID: 2800000, guid: 1ae72daff877f9744ae5e96e31a47645, type: 3}
-        m_Scale: {x: 1000, y: 1000}
+        m_Texture: {fileID: 2800000, guid: 552ac6c8d2f38364d89990a022c65e2c, type: 3}
+        m_Scale: {x: 4, y: 4}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
@@ -115,22 +115,22 @@ Material:
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
-    - _PickX: 0.0234375
+    - _PickX: 0.9921875
     - _PowY: 1
     - _QueueControl: 0
     - _QueueOffset: 0
     - _RangeYBottom: 0
-    - _RangeYTop: 1
+    - _RangeYTop: 0.96
     - _ReceiveShadows: 1
     - _SHADOWS_SOFT: 1
-    - _ShadowStrength: 1
+    - _ShadowStrength: 0.5
     - _Smoothness: 0.1
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 0
-    - _TextureStrength: 0.02
+    - _TextureStrength: 0.05
     - _WorkflowMode: 1
     - _YPow: 1
     - _ZWrite: 1
