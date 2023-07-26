@@ -28,6 +28,7 @@ public class PlayerMovement : MonoBehaviour
     private void OnMovement(InputValue value)
     {
         move = value.Get<Vector2>();
+        move = Vector2.ClampMagnitude(move, 1f);
     }
 
 #pragma warning restore IDE0051
