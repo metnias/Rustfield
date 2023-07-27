@@ -15,15 +15,6 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Camera",
-                    "type": "Value",
-                    "id": "a3bf04cd-e556-48f6-aff4-c5933ebdbccb",
-                    "expectedControlType": "Vector2",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
                     "name": "Jump",
                     "type": "Button",
                     "id": "45370c4a-cf17-4403-bb7c-dcc7fcaf5e28",
@@ -34,28 +25,6 @@
                 }
             ],
             "bindings": [
-                {
-                    "name": "",
-                    "id": "635d2438-16d6-4f69-9a88-ed3b2320bafd",
-                    "path": "<Gamepad>/rightStick",
-                    "interactions": "",
-                    "processors": "StickDeadzone",
-                    "groups": "",
-                    "action": "Camera",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "cb29f64a-459a-4122-a33a-a8904cbbb8d2",
-                    "path": "<Mouse>/delta",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Camera",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
                 {
                     "name": "WASD",
                     "id": "a8e0d0cf-3109-4332-9b7c-a02ce2f5c34b",
@@ -141,6 +110,54 @@
                     "processors": "",
                     "groups": "",
                     "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "CameraActions",
+            "id": "37abc9d7-4578-42d4-8016-d9377777fb11",
+            "actions": [
+                {
+                    "name": "CameraStick",
+                    "type": "Value",
+                    "id": "bc9baff0-71f6-4326-8502-93a663df2c2b",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "CameraMouse",
+                    "type": "Value",
+                    "id": "fbe533d9-1ef4-4f3d-a585-234bd9c8a12b",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "d4168470-fce2-45d2-8496-1ce08f43d2d6",
+                    "path": "<Gamepad>/rightStick",
+                    "interactions": "",
+                    "processors": "StickDeadzone",
+                    "groups": "",
+                    "action": "CameraStick",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ba0328b3-a415-4aae-b96a-212352244380",
+                    "path": "<Mouse>/delta",
+                    "interactions": "",
+                    "processors": "ScaleVector2(x=0.3,y=0.3)",
+                    "groups": "",
+                    "action": "CameraMouse",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
