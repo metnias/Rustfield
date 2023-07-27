@@ -9,11 +9,11 @@ void MainLight_float(float3 WorldPos, out float3 Direction, out float3 Color, ou
     DistanceAtten = 1;
     ShadowAtten = 1;
 #else
-    #if SHADOWS_SCREEN
-        float4 clipPos = TransformWorldToHClip(WorldPos);
-        float4 shadowCoord = ComputeScreenPos(clipPos);
-    #else
-        float4 shadowCoord = TransformWorldToShadowCoord(WorldPos);
+#if SHADOWS_SCREEN
+    float4 clipPos = TransformWorldToHClip(WorldPos);
+    float4 shadowCoord = ComputeScreenPos(clipPos);
+#else
+    float4 shadowCoord = TransformWorldToShadowCoord(WorldPos);
 #endif
     Light mainLight = GetMainLight(shadowCoord);
     Direction = mainLight.direction;
@@ -31,11 +31,11 @@ void MainLight_half(float3 WorldPos, out half3 Direction, out half3 Color, out h
     DistanceAtten = 1;
     ShadowAtten = 1;
 #else
-    #if SHADOWS_SCREEN
-        half4 clipPos = TransformWorldToHClip(WorldPos);
-        half4 shadowCoord = ComputeScreenPos(clipPos);
-    #else
-        half4 shadowCoord = TransformWorldToShadowCoord(WorldPos);
+#if SHADOWS_SCREEN
+    half4 clipPos = TransformWorldToHClip(WorldPos);
+    half4 shadowCoord = ComputeScreenPos(clipPos);
+#else
+    half4 shadowCoord = TransformWorldToShadowCoord(WorldPos);
 #endif
     Light mainLight = GetMainLight(shadowCoord);
     Direction = mainLight.direction;
@@ -65,7 +65,7 @@ void DirectSpecular_half(half3 Specular, half Smoothness, half3 Direction, half3
     Smoothness = exp2(10 * Smoothness + 1);
     WorldNormal = normalize(WorldNormal);
     WorldView = SafeNormalize(WorldView);
-    Out = LightingSpecular(Color, Direction, WorldNormal, WorldView,half4(Specular, 0), Smoothness);
+    Out = LightingSpecular(Color, Direction, WorldNormal, WorldView, half4(Specular, 0), Smoothness);
 #endif
 }
 

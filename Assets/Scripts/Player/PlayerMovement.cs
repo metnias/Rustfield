@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,14 +8,19 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField, Range(0f, 100f)]
     private float speed = 1f;
+
     [SerializeField, Range(0f, 100f)]
     private float acceleration = 2f, airAcceleration = 1f;
+
     [SerializeField, Range(0f, 100f)]
     private float jumpStrength = 10f;
+
     [SerializeField, Range(0f, 90f)]
     private float maxGroundAngle = 60f;
+
     [SerializeField, Range(0f, 20f)]
     private float gravity = 1f;
+
     [SerializeField]
     private LayerMask standableMask = -1;
 
@@ -152,7 +155,9 @@ public class PlayerMovement : MonoBehaviour
     }
 
     #region InputSystem
+
 #pragma warning disable IDE0051
+
     private void OnMovement(InputValue value)
     {
         move = value.Get<Vector2>();
@@ -165,6 +170,6 @@ public class PlayerMovement : MonoBehaviour
     }
 
 #pragma warning restore IDE0051
-#endregion InputSystem
 
+    #endregion InputSystem
 }
