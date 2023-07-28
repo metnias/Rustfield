@@ -181,7 +181,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnJump(InputValue _)
     {
-        wantToJump = 0.5f;
+        wantToJump = 0.2f;
     }
 
 #pragma warning restore IDE0051

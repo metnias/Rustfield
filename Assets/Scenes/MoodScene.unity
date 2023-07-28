@@ -374,7 +374,7 @@ GameObject:
   - component: {fileID: 60293527}
   - component: {fileID: 60293526}
   - component: {fileID: 60293525}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -479,7 +479,7 @@ GameObject:
   - component: {fileID: 90592691}
   - component: {fileID: 90592690}
   - component: {fileID: 90592689}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Sphere (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -584,7 +584,7 @@ GameObject:
   - component: {fileID: 151721046}
   - component: {fileID: 151721045}
   - component: {fileID: 151721044}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1426,7 +1426,7 @@ GameObject:
   - component: {fileID: 325765854}
   - component: {fileID: 325765853}
   - component: {fileID: 325765852}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Sphere (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1933,7 +1933,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 376234360}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: GameObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2223,7 +2223,7 @@ GameObject:
   - component: {fileID: 529145158}
   - component: {fileID: 529145157}
   - component: {fileID: 529145156}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2325,7 +2325,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 604416154}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Obstacles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4687,7 +4687,7 @@ GameObject:
   - component: {fileID: 1487372531}
   - component: {fileID: 1487372530}
   - component: {fileID: 1487372529}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5546,7 +5546,7 @@ GameObject:
   - component: {fileID: 1821107892}
   - component: {fileID: 1821107891}
   - component: {fileID: 1821107890}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10728,6 +10728,9 @@ MonoBehaviour:
   distance: 15
   focusRadius: 2
   focusCentering: 0.8
+  obstructionMask:
+    serializedVersion: 2
+    m_Bits: 1
   rotationSpeed: 90
   minVerticalAngle: -30
   maxVerticalAngle: 60
@@ -10897,7 +10900,7 @@ GameObject:
   - component: {fileID: 2119855089}
   - component: {fileID: 2119855088}
   - component: {fileID: 2119855087}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Sphere (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
