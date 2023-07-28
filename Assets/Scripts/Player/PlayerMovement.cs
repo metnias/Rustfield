@@ -51,7 +51,7 @@ public class PlayerMovement : MonoBehaviour
     private bool OnSteep => steepContactCount > 0;
     private bool Climbing => climbContactCount > 0 && stepsSinceLastJump > 2;
     private float minGroundDotProduct, minClimbDotProduct;
-    private Vector3 contactNormal, steepNormal, climbNormal;
+    private Vector3 contactNormal, steepNormal, climbNormal, lastClimbNormal;
     private int groundContactCount = 0, steepContactCount = 0, climbContactCount;
     private int stepsSinceLastGrounded = 0, stepsSinceLastJump = 0;
 
@@ -73,6 +73,7 @@ public class PlayerMovement : MonoBehaviour
         UpdateState();
 
         if (Climbing) velocity -= contactNormal * (climbMaxAcceleration * 0.9f * Time.fixedDeltaTime);
+        else if (OnGround && velocity.sqrMagnitude < 0.01f) velocity += contactNormal * (Vector3.Dot(Physics.gravity, contactNormal) * Time.fixedDeltaTime);
         else velocity += gravity * Time.fixedDeltaTime * Physics.gravity;
 
         if (wantToJump > 0f)
@@ -103,13 +104,17 @@ public class PlayerMovement : MonoBehaviour
 
             bool CheckClimbing()
             {
-                if (Climbing)
+                if (!Climbing) return false;
+
+                if (climbContactCount > 1)
                 {
-                    groundContactCount = climbContactCount;
-                    contactNormal = climbNormal;
-                    return true;
+                    climbNormal.Normalize();
+                    float upDot = Vector3.Dot(upAxis, climbNormal);
+                    if (upDot >= minGroundDotProduct) climbNormal = lastClimbNormal;
                 }
-                return false;
+                groundContactCount = 1;
+                contactNormal = climbNormal;
+                return true;
             }
             void UpdateConnectionState()
             {
@@ -238,6 +243,7 @@ public class PlayerMovement : MonoBehaviour
                 {
                     ++climbContactCount;
                     climbNormal += normal;
+                    lastClimbNormal = normal;
                     connectedBody = collision.rigidbody;
                 }
             }
