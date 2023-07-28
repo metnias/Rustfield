@@ -191,7 +191,7 @@ public class PlayerMovement : MonoBehaviour
             float maxSpeedChange = acceleration * Time.fixedDeltaTime;
 
             var direction = moveInput;
-            if (playerInputSpace)
+            if (!Climbing && playerInputSpace)
             {
                 Vector3 forward = playerInputSpace.forward;
                 forward.y = 0f; forward.Normalize();
