@@ -202,6 +202,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rBody: {fileID: 42296543}
+  playerInputSpace: {fileID: 1910590542}
   speed: 15
   acceleration: 40
   airAcceleration: 20

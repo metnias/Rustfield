@@ -6,12 +6,17 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private Rigidbody rBody;
 
+    [SerializeField]
+    private Transform playerInputSpace = default;
+
+    [Header("Horizontal")]
     [SerializeField, Range(0f, 100f)]
     private float speed = 1f;
 
     [SerializeField, Range(0f, 100f)]
     private float acceleration = 2f, airAcceleration = 1f;
 
+    [Header("Vertical")]
     [SerializeField, Range(0f, 100f)]
     private float jumpStrength = 10f;
 
@@ -123,8 +128,18 @@ public class PlayerMovement : MonoBehaviour
             float acc = OnGround ? acceleration : airAcceleration;
             float maxSpeedChange = acc * Time.fixedDeltaTime;
 
-            float newX = Mathf.MoveTowards(currentX, speed * move.x, maxSpeedChange);
-            float newZ = Mathf.MoveTowards(currentZ, speed * move.y, maxSpeedChange);
+            var direction = move;
+            if (playerInputSpace)
+            {
+                Vector3 forward = playerInputSpace.forward;
+                forward.y = 0f; forward.Normalize();
+                Vector3 right = playerInputSpace.right;
+                right.y = 0f; right.Normalize();
+                var relDir = forward * direction.y + right * direction.x;
+                direction = new(relDir.x, relDir.z);
+            }
+            float newX = Mathf.MoveTowards(currentX, speed * direction.x, maxSpeedChange);
+            float newZ = Mathf.MoveTowards(currentZ, speed * direction.y, maxSpeedChange);
 
             velocity += xAxis * (newX - currentX) + zAxis * (newZ - currentZ);
         }
