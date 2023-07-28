@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static UnityEditor.IMGUI.Controls.CapsuleBoundsHandle;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -9,25 +10,38 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private Transform playerInputSpace = default;
 
-    [Header("Horizontal")]
+    [Header("Run")]
     [SerializeField, Range(0f, 100f)]
-    private float speed = 1f;
+    private float maxSpeed = 1f;
 
     [SerializeField, Range(0f, 100f)]
-    private float acceleration = 2f, airAcceleration = 1f;
+    private float maxAcceleration = 2f;
 
-    [Header("Vertical")]
+    [SerializeField]
+    private LayerMask standableMask = -1;
+
+    [Header("Jump")]
     [SerializeField, Range(0f, 100f)]
     private float jumpStrength = 10f;
 
     [SerializeField, Range(0f, 90f)]
-    private float maxGroundAngle = 60f;
+    private float groundMaxAngle = 60f;
+
+    [SerializeField, Range(0f, 100f)]
+    private float airMaxAcceleration = 1f;
 
     [SerializeField, Range(0f, 20f)]
     private float gravity = 1f;
 
-    [SerializeField]
-    private LayerMask standableMask = -1;
+    [Header("Climb")]
+    [SerializeField, Range(0f, 100f)]
+    private float climbMaxSpeed = 1f;
+
+    [SerializeField, Range(0f, 100f)]
+    private float climbMaxAcceleration = 1f;
+
+    [SerializeField, Range(90, 180)]
+    private float climbMaxAngle = 140f;
 
     private Vector2 moveInput = Vector2.zero;
     private Rigidbody connectedBody, previousConnectedBody;
@@ -35,14 +49,16 @@ public class PlayerMovement : MonoBehaviour
     private float wantToJump = 0f;
     private bool OnGround => groundContactCount > 0;
     private bool OnSteep => steepContactCount > 0;
-    private float minGroundDotProduct;
-    private Vector3 contactNormal = Vector3.up, steepNormal = Vector3.zero;
-    private int groundContactCount = 0, steepContactCount = 0;
+    private bool Climbing => climbContactCount > 0 && stepsSinceLastJump > 2;
+    private float minGroundDotProduct, minClimbDotProduct;
+    private Vector3 contactNormal, steepNormal, climbNormal;
+    private int groundContactCount = 0, steepContactCount = 0, climbContactCount;
     private int stepsSinceLastGrounded = 0, stepsSinceLastJump = 0;
 
     private void OnValidate()
     {
-        minGroundDotProduct = Mathf.Cos(maxGroundAngle * Mathf.Deg2Rad);
+        minGroundDotProduct = Mathf.Cos(groundMaxAngle * Mathf.Deg2Rad);
+        minClimbDotProduct = Mathf.Cos(climbMaxAngle * Mathf.Deg2Rad);
     }
 
     private void Start()
@@ -52,10 +68,13 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        Vector3 upAxis = -Physics.gravity.normalized;
         Vector3 velocity = rBody.velocity;
         UpdateState();
 
-        velocity += gravity * Time.fixedDeltaTime * Physics.gravity;
+        if (Climbing) velocity -= contactNormal * (climbMaxAcceleration * 0.9f * Time.fixedDeltaTime);
+        else velocity += gravity * Time.fixedDeltaTime * Physics.gravity;
+
         if (wantToJump > 0f)
         {
             wantToJump -= Time.fixedDeltaTime;
@@ -67,7 +86,7 @@ public class PlayerMovement : MonoBehaviour
 
         void UpdateState()
         {
-            if (OnGround || SnapToGround() || CheckSteepContacts())
+            if (CheckClimbing() || OnGround || SnapToGround() || CheckSteepContacts())
             {
                 stepsSinceLastGrounded = 0;
                 contactNormal.Normalize();
@@ -75,13 +94,23 @@ public class PlayerMovement : MonoBehaviour
             else
             {
                 ++stepsSinceLastGrounded;
-                contactNormal = Vector3.up;
+                contactNormal = upAxis;
             }
             ++stepsSinceLastJump;
             if (connectedBody)
                 if (connectedBody.isKinematic || connectedBody.mass >= rBody.mass)
                     UpdateConnectionState();
 
+            bool CheckClimbing()
+            {
+                if (Climbing)
+                {
+                    groundContactCount = climbContactCount;
+                    contactNormal = climbNormal;
+                    return true;
+                }
+                return false;
+            }
             void UpdateConnectionState()
             {
                 if (connectedBody == previousConnectedBody)
@@ -97,8 +126,8 @@ public class PlayerMovement : MonoBehaviour
         {
             if (stepsSinceLastGrounded > 1 || stepsSinceLastJump <= 2) return false;
             float curSpeed = velocity.magnitude;
-            if (curSpeed > speed * 0.8f) return false;
-            if (!Physics.Raycast(rBody.position, Vector3.down, out RaycastHit hit, 0.5f, standableMask)) return false;
+            if (curSpeed > maxSpeed * 0.8f) return false;
+            if (!Physics.Raycast(rBody.position, -upAxis, out RaycastHit hit, 0.5f, standableMask)) return false;
             if (hit.normal.y < minGroundDotProduct) return false;
             contactNormal = hit.normal;
             float newSpeed = velocity.magnitude;
@@ -127,7 +156,7 @@ public class PlayerMovement : MonoBehaviour
             if (OnGround) jumpDir = contactNormal;
             else if (OnSteep) jumpDir = steepNormal;
             else return;
-            jumpDir = (jumpDir + Vector3.up).normalized;
+            jumpDir = (jumpDir + upAxis).normalized;
 
             stepsSinceLastJump = 0; wantToJump = 0f;
             float jumpSpeed = jumpStrength;
@@ -137,14 +166,29 @@ public class PlayerMovement : MonoBehaviour
         }
         void AdjustVelocity()
         {
-            Vector3 xAxis = ProjectOnContactPlane(Vector3.right).normalized;
-            Vector3 zAxis = ProjectOnContactPlane(Vector3.forward).normalized;
+            float acceleration, speed;
+            Vector3 xAxis, zAxis;
+            if (Climbing)
+            {
+                acceleration = climbMaxAcceleration;
+                speed = climbMaxSpeed;
+                xAxis = Vector3.Cross(contactNormal, upAxis);
+                zAxis = upAxis;
+            }
+            else
+            {
+                acceleration = OnGround ? maxAcceleration : airMaxAcceleration;
+                speed = maxSpeed;
+                xAxis = ProjectDirectionOnPlane(Vector3.right, upAxis);
+                zAxis = ProjectDirectionOnPlane(Vector3.forward, upAxis);
+            }
+            xAxis = ProjectDirectionOnPlane(xAxis, contactNormal);
+            zAxis = ProjectDirectionOnPlane(zAxis, contactNormal);
 
             Vector3 relativeVelocity = velocity - connectionVelocity;
             float currentX = Vector3.Dot(relativeVelocity, xAxis);
             float currentZ = Vector3.Dot(relativeVelocity, zAxis);
-            float acc = OnGround ? acceleration : airAcceleration;
-            float maxSpeedChange = acc * Time.fixedDeltaTime;
+            float maxSpeedChange = acceleration * Time.fixedDeltaTime;
 
             var direction = moveInput;
             if (playerInputSpace)
@@ -161,11 +205,11 @@ public class PlayerMovement : MonoBehaviour
 
             velocity += xAxis * (newX - currentX) + zAxis * (newZ - currentZ);
         }
-        Vector3 ProjectOnContactPlane(Vector3 vector) => vector - contactNormal * Vector3.Dot(vector, contactNormal);
+        Vector3 ProjectDirectionOnPlane(Vector3 direction, Vector3 normal) => (direction - normal * Vector3.Dot(direction, normal)).normalized;
         void ClearState()
         {
-            groundContactCount = steepContactCount = 0;
-            contactNormal = steepNormal = connectionVelocity = Vector3.zero;
+            groundContactCount = steepContactCount = climbContactCount = 0;
+            contactNormal = steepNormal = climbNormal = connectionVelocity = Vector3.zero;
             previousConnectedBody = connectedBody;
             connectedBody = null;
         }
@@ -182,11 +226,20 @@ public class PlayerMovement : MonoBehaviour
                 contactNormal += normal;
                 connectedBody = collision.rigidbody;
             }
-            else if (normal.y > -0.01f)
+            else
             {
-                ++steepContactCount;
-                steepNormal += normal;
-                if (groundContactCount == 0) connectedBody = collision.rigidbody;
+                if (normal.y > -0.01f)
+                {
+                    ++steepContactCount;
+                    steepNormal += normal;
+                    if (groundContactCount == 0) connectedBody = collision.rigidbody;
+                }
+                if (normal.y >= minClimbDotProduct)
+                {
+                    ++climbContactCount;
+                    climbNormal += normal;
+                    connectedBody = collision.rigidbody;
+                }
             }
         }
     }

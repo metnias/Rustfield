@@ -203,15 +203,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rBody: {fileID: 42296543}
   playerInputSpace: {fileID: 1910590542}
-  speed: 15
-  acceleration: 40
-  airAcceleration: 20
-  jumpStrength: 25
-  maxGroundAngle: 60
-  gravity: 4
+  maxSpeed: 15
+  maxAcceleration: 40
   standableMask:
     serializedVersion: 2
     m_Bits: 65
+  jumpStrength: 25
+  groundMaxAngle: 60
+  airMaxAcceleration: 20
+  gravity: 4
+  climbMaxSpeed: 10
+  climbMaxAcceleration: 50
+  climbMaxAngle: 140
 --- !u!54 &42296543
 Rigidbody:
   m_ObjectHideFlags: 0
