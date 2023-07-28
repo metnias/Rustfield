@@ -25,8 +25,15 @@ public class OrbitCamera : MonoBehaviour
     [SerializeField, Range(-89f, 89f)]
     private float minVerticalAngle = -30f, maxVerticalAngle = 60f;
 
-    private Vector3 focusPoint;
+    [SerializeField, Min(0f)]
+    private float alignDelay = 5f;
+
+    [SerializeField, Range(0f, 90f)]
+    private float alignSmoothRange = 45f;
+
+    private Vector3 focusPoint, previousFocusPoint;
     private Vector2 orbitAngles = new Vector2(45f, 0f);
+    private float lastManualRotationTime;
 
     private void OnValidate()
     {
@@ -47,7 +54,7 @@ public class OrbitCamera : MonoBehaviour
     {
         UpdateFocusPoint();
         Quaternion lookRotation;
-        if (ManualRotation())
+        if (ManualRotation() || AutomaticRotation())
         {
             ConstrainAngles();
             lookRotation = Quaternion.Euler(orbitAngles);
@@ -62,6 +69,7 @@ public class OrbitCamera : MonoBehaviour
 
         void UpdateFocusPoint()
         {
+            previousFocusPoint = focusPoint;
             Vector3 targetPoint = focus.position;
             if (focusRadius > 0f)
             {
@@ -84,11 +92,35 @@ public class OrbitCamera : MonoBehaviour
         }
         bool ManualRotation()
         {
-            if (mouseRotated) return true;
+            if (mouseRotated) { mouseRotated = false; lastManualRotationTime = Time.unscaledTime; return true; }
             if (lastStickInput.magnitude < 0.01f) return false;
+            lastManualRotationTime = Time.unscaledTime;
             orbitAngles.x -= rotationSpeed * Time.unscaledDeltaTime * lastStickInput.y;
             orbitAngles.y += rotationSpeed * Time.unscaledDeltaTime * lastStickInput.x;
             return true;
+        }
+        bool AutomaticRotation()
+        {
+            if (Time.unscaledTime - lastManualRotationTime < alignDelay)
+                return false;
+
+            Vector2 movement = new(focusPoint.x - previousFocusPoint.x, focusPoint.z - previousFocusPoint.z);
+            float movementDeltaSqr = movement.sqrMagnitude;
+            if (movementDeltaSqr < 0.0001f) return false;
+
+            float headingAngle = GetAngle(movement / Mathf.Sqrt(movementDeltaSqr));
+            float deltaAbs = Mathf.Abs(Mathf.DeltaAngle(orbitAngles.y, headingAngle));
+            float rotationChange = rotationSpeed * Mathf.Min(Time.unscaledDeltaTime, movementDeltaSqr);
+            if (deltaAbs < alignSmoothRange) rotationChange *= deltaAbs / alignSmoothRange;
+            else if (180f - deltaAbs < alignSmoothRange) rotationChange *= (180f - deltaAbs) / alignSmoothRange;
+            orbitAngles.y = Mathf.MoveTowardsAngle(orbitAngles.y, headingAngle, rotationChange);
+            return true;
+
+            static float GetAngle(Vector2 direction)
+            {
+                float angle = Mathf.Acos(direction.y) * Mathf.Rad2Deg;
+                return direction.x < 0f ? 360f - angle : angle;
+            }
         }
         void ConstrainAngles()
         {
