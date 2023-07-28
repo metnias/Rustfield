@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 42296542}
   - component: {fileID: 42296541}
   - component: {fileID: 42296543}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -4901,7 +4901,7 @@ GameObject:
   - component: {fileID: 1526891841}
   - component: {fileID: 1526891840}
   - component: {fileID: 1526891845}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: PlayerSphere
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -4950,6 +4950,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 7a1a25410409bf048b2a06af6df1a424, type: 2}
+  - {fileID: 2100000, guid: 29abdbbeafcacd444b14b4be535d5dd7, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
