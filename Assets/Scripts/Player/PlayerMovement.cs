@@ -29,7 +29,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private LayerMask standableMask = -1;
 
-    private Vector2 move = Vector2.zero;
+    private Vector2 moveInput = Vector2.zero;
+    private Rigidbody connectedBody, previousConnectedBody;
+    private Vector3 connectionVelocity, connectionWorldPosition, connectionLocalPosition;
     private float wantToJump = 0f;
     private bool OnGround => groundContactCount > 0;
     private bool OnSteep => steepContactCount > 0;
@@ -76,6 +78,20 @@ public class PlayerMovement : MonoBehaviour
                 contactNormal = Vector3.up;
             }
             ++stepsSinceLastJump;
+            if (connectedBody)
+                if (connectedBody.isKinematic || connectedBody.mass >= rBody.mass)
+                    UpdateConnectionState();
+
+            void UpdateConnectionState()
+            {
+                if (connectedBody == previousConnectedBody)
+                {
+                    Vector3 connectionMovement = connectedBody.transform.TransformPoint(connectionLocalPosition) - connectionWorldPosition;
+                    connectionVelocity = connectionMovement / Time.deltaTime;
+                }
+                connectionWorldPosition = rBody.position;
+                connectionLocalPosition = connectedBody.transform.InverseTransformPoint(connectionWorldPosition);
+            }
         }
         bool SnapToGround()
         {
@@ -88,6 +104,7 @@ public class PlayerMovement : MonoBehaviour
             float newSpeed = velocity.magnitude;
             float dot = Vector3.Dot(velocity, hit.normal);
             if (dot > 0f) velocity = (velocity - hit.normal * dot).normalized * newSpeed;
+            connectedBody = hit.rigidbody;
             return true;
         }
         bool CheckSteepContacts()
@@ -123,12 +140,13 @@ public class PlayerMovement : MonoBehaviour
             Vector3 xAxis = ProjectOnContactPlane(Vector3.right).normalized;
             Vector3 zAxis = ProjectOnContactPlane(Vector3.forward).normalized;
 
-            float currentX = Vector3.Dot(velocity, xAxis);
-            float currentZ = Vector3.Dot(velocity, zAxis);
+            Vector3 relativeVelocity = velocity - connectionVelocity;
+            float currentX = Vector3.Dot(relativeVelocity, xAxis);
+            float currentZ = Vector3.Dot(relativeVelocity, zAxis);
             float acc = OnGround ? acceleration : airAcceleration;
             float maxSpeedChange = acc * Time.fixedDeltaTime;
 
-            var direction = move;
+            var direction = moveInput;
             if (playerInputSpace)
             {
                 Vector3 forward = playerInputSpace.forward;
@@ -147,7 +165,9 @@ public class PlayerMovement : MonoBehaviour
         void ClearState()
         {
             groundContactCount = steepContactCount = 0;
-            contactNormal = steepNormal = Vector3.zero;
+            contactNormal = steepNormal = connectionVelocity = Vector3.zero;
+            previousConnectedBody = connectedBody;
+            connectedBody = null;
         }
     }
 
@@ -160,11 +180,13 @@ public class PlayerMovement : MonoBehaviour
             {
                 ++groundContactCount;
                 contactNormal += normal;
+                connectedBody = collision.rigidbody;
             }
             else if (normal.y > -0.01f)
             {
                 ++steepContactCount;
                 steepNormal += normal;
+                if (groundContactCount == 0) connectedBody = collision.rigidbody;
             }
         }
     }
@@ -175,8 +197,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnMovement(InputValue value)
     {
-        move = value.Get<Vector2>();
-        move = Vector2.ClampMagnitude(move, 1f);
+        moveInput = value.Get<Vector2>();
+        moveInput = Vector2.ClampMagnitude(moveInput, 1f);
     }
 
     private void OnJump(InputValue _)
