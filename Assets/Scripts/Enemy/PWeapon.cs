@@ -2,6 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IPartBuilder
+public abstract class PWeapon : Part
 {
 }
