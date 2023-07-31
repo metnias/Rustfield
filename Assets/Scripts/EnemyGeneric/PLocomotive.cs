@@ -2,10 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public sealed class Robot : Part
+public class PLocomotive : Part
 {
-    private readonly List<PLocomotive> subLocomotives = new();
-
     public override void Build(BuildInfo info)
     {
     }

@@ -18,6 +18,12 @@ public abstract class Part : MonoBehaviour
 
     #region Builder
 
+    public struct BuildInfo
+    {
+    }
+
+    public abstract void Build(BuildInfo info);
+
     public void AddPart(Part part)
     {
         subParts.Add(part);
